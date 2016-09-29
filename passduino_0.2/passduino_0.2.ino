@@ -21,9 +21,10 @@
 MFRC522 rfid(SS_PIN, RST_PIN); // Instance of the class
 MFRC522::MIFARE_Key key; 
 
-// Init array that will store new NUID 
-byte nuidPICC[3];
-
+// Init array that will store new NUID (needed by MFRC552 lib ) 
+byte nuidPICC[4];
+//variable to store/search for tag ids in memory
+byte TagId[3];
 //init increment for all loops 
 byte i;
 
@@ -42,8 +43,7 @@ byte Mode[2];
  const PROGMEM int user3Memory=368;
  const PROGMEM int user4Memory=552;
  const PROGMEM int user5Memory=736;
- //dummy variable
- int dummy;
+
  //function definitions:
 /**
  * Helper routine to dump a byte array as hex values to Serial. 
@@ -53,7 +53,7 @@ void printHex(byte *buffer, byte bufferSize);
 /**
  * checking for cards and save the NUID  into the nuidPICC array
  */
-void checkForCards();
+bool checkForCards();
 
 
 void setup() { 
@@ -112,12 +112,37 @@ void loop()
                       SerialData.getBytes(SerialBuffer,10);
                       EEPROM.put(921,SerialBuffer); // update user password
                       EEPROM.get(921,AdminPassword);
+                      Serial.println('1');
                       Mode[0] = 0;
                       AdminMode=false;
                       break;      
                     }
-              }
-          
+             }
+           while(Mode[0] == 50)
+           //add tag ID and password
+           {
+            //init the id variable and remove any previous cards value
+            for (byte i = 0; i < 4; i++) 
+            {
+              nuidPICC[i] = 0x00;
+            }
+               while(!checkForCards())
+               {
+                //wait for new card to be detected
+               }
+               EEPROM.put(user1Memory,nuidPICC);
+               Serial.println('1');
+               if(Serial.available() > 0)
+         {
+          SerialData="";
+          //could be implemented better !!! but just for the notte dei ricercatori
+          SerialData=Serial.readStringUntil('\n');
+          SerialData.getBytes(Mode,2);}
+               Mode[0] = 0;
+               AdminMode=false;
+               break;      
+              
+            }
           
           }
          }
@@ -128,36 +153,38 @@ void loop()
      AdminMode=false;
     }
   } 
-  checkForCards();
+  if(checkForCards())
+  {
+  printHex(rfid.uid.uidByte,MFRC522::MF_KEY_SIZE);
+  Serial.println("");
+  }
 }
 
 
 
 
 
-void checkForCards()
+bool checkForCards()
 {
    // Look for new cards
   if (!rfid.PICC_IsNewCardPresent())
-    return;
+    return false;
   // Verify if the NUID has been readed
   if (!rfid.PICC_ReadCardSerial())
-    return;
+    return false;
   MFRC522::PICC_Type piccType = rfid.PICC_GetType(rfid.uid.sak);
   // Check is the PICC of Classic MIFARE type
   if (piccType != MFRC522::PICC_TYPE_MIFARE_MINI &&  
     piccType != MFRC522::PICC_TYPE_MIFARE_1K &&
     piccType != MFRC522::PICC_TYPE_MIFARE_4K) 
-    return;
+    return false;
     // Store NUID into nuidPICC array
    for ( i = 0; i < 4; i++) 
    {
       nuidPICC[i] = rfid.uid.uidByte[i];
    }
-    Serial.println("The NUID tag is:");
-    printHex(rfid.uid.uidByte,MFRC522::MF_KEY_SIZE); 
-    Serial.println();
-    delay(500);
+   
+   return true;
 }
 
 
