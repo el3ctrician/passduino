@@ -1,4 +1,18 @@
-
+/**
+ * passduino v0.2 
+ * memory structure :
+ * we can have 5 users with 20 password for user
+ * 
+ * 4 bytes at each section for ID 
+ * 10 bytes for each password 
+ * 
+ * total EEPROM used 
+ * 4*5 = 20
+ * 9*20*5=900     // 9 chars for each password and 20 passwords for 5 users 
+ * so in total 920 and we still have 104  bytes that can be used for bruteforce protection and for storing masterpassword 
+ * 
+ */
+#include <avr/pgmspace.h>
 #include <SPI.h>
 #include <MFRC522.h>
 #include <EEPROM.h>
@@ -15,13 +29,22 @@ byte i;
 
 //String for serial data between frontend  and backend
 String SerialData;
-//string for admin password
-String AdminPassword="Password";
+char SerialBuffer[10];
+//Array for admin password
+ char AdminPassword[10];
 //Bool for keeping the device in Admin Mode and stop scanning for Cards
 bool AdminMode;
 // byte to choose between different mods of operations in Admin mode
-byte Mode;
-//function definitions:
+byte Mode[2];
+//Memory Addresses for each sections
+ const PROGMEM int user1Memory=0; // id associated to user is stored in the first 4 bytes 
+ const PROGMEM int user2Memory=184;
+ const PROGMEM int user3Memory=368;
+ const PROGMEM int user4Memory=552;
+ const PROGMEM int user5Memory=736;
+ //dummy variable
+ int dummy;
+ //function definitions:
 /**
  * Helper routine to dump a byte array as hex values to Serial. 
  */
@@ -41,6 +64,12 @@ void setup() {
   for (byte i = 0; i < 6; i++) {
     key.keyByte[i] = 0xFF;
   }
+  while(!Serial)
+  {
+    // wait for serial port
+  }
+  //getting AdminPassword From EEPROM
+  EEPROM.get(921,AdminPassword);
 }
 
 
@@ -51,52 +80,52 @@ void loop()
   if(Serial.available() > 0)
   {
    SerialData=Serial.readStringUntil('\n');
-   if (SerialData == AdminPassword)
+   SerialData.getBytes(SerialBuffer,10);
+   if (strcmp(AdminPassword,SerialBuffer)==0)
     {
     //starting Admin Mode
      Serial.print('1');
      AdminMode = true;
      while (AdminMode)
      {
-      while(!Serial.available() > 0)
-      {
         if(Serial.available() > 0)
          {
-          Mode=Serial.read();
-          switch (Mode)
-          {
+          SerialData="";
+          //could be implemented better !!! but just for the notte dei ricercatori
+          SerialData=Serial.readStringUntil('\n');
+          SerialData.getBytes(Mode,2);
+          //check for correct modes 
+          if(Mode[0] != 49 && Mode[0] != 50 && Mode[0] != 51 )
+           {
+            Serial.println("Protocol Error !!!");
+            AdminMode=false;
+            break;
+           }
+          
+           while(Mode[0] == 49)
            //change device master password
-           case 1:
-             while(!Serial.available() > 0)
-              {
-                if(Serial.available() > 0)
+           {
+             if(Serial.available() > 0)
                     {
-                      AdminPassword=Serial.readStringUntil('\n');  
+                      SerialData="";
+                      SerialData=Serial.readStringUntil('\n');
+                      SerialData.getBytes(SerialBuffer,10);
+                      EEPROM.put(921,SerialBuffer); // update user password
+                      EEPROM.get(921,AdminPassword);
+                      Mode[0] = 0;
                       AdminMode=false;
                       break;      
                     }
               }
-           break;      
-           case 2:
-            //aggiungi un ID e password
-           break;
-           case 3:
-           //modificare password associata ad un TAG
-           break;
-           default:
-            // give error
-           break;
+          
+          
           }
-          break;
-
          }
       }
-      AdminMode=false; //ending Admin Mode
-     }
-    }
    else
     {
      Serial.print('0');
+     AdminMode=false;
     }
   } 
   checkForCards();
