@@ -17,34 +17,32 @@ def go_root(mode):
     serial_port.write(mode)
 
     if serial_port.readall() == 1:
-        root = True
+        password = raw_input('Enter root password:')
 
+        while :
+            if len(password) <= 5:
+                print('The inserted password is too short')
+            elif len(password) > 10:
+                print('The inserted password is too long')
+            else:
+                break
 
-def request(mode, uid):
-    serial_port.open()
-    serial_port.write(mode)
-    response = serial_port.read()
+        serial_port.write(password)
 
-    if response == 1:
-        if request == "getpasswd":
-            get_password(uid)
-        elif request == "setpassword":
-            set_password(uid, password)
-        else:
-            hard_reset()
+        if serial_port.readall() == 1:
+            root = True
+            return True
 
-    if response == 1:
-        return True
-    else:
-        return False
-
+    root = False
+    return False
 
 def get_password(uid):
     serial_port.write(uid)
     response = serial_port.read()
 
     if response == 1:
-        return serial_port.readall()
+        pyperclip.copy(serial_port.readall())
+        return True
 
     print('No password associated with this uid')
     return False
@@ -56,7 +54,26 @@ def set_password(uid, password):
 def hard_reset():
     serial_port.write('This is the end, my only friend, the end')
 
-while 1:
-    #1)Controlla rfid
-    #2)Controlla tastino
-    #3)Controlla autodistruzione
+def init():
+    serial_port.open()
+
+
+if __name__ == "__main__":
+    init()
+    while 1:
+        response = serial_port.read()
+
+        if pin_pressed == True:
+            go_root(mode)
+
+        serial_port.write(mode)
+
+        if root == True:
+            if request == 'setpassword':
+                set_password(uid)
+            elif request == 'hardreset':
+                hard_reset()
+
+        get_password(response)
+
+        root = False
