@@ -30,9 +30,11 @@ byte i;
 
 //String for serial data between frontend  and backend
 String SerialData;
-char SerialBuffer[10];
+char SerialBuffer[9];
+//Array for dumping passwords from memory
+char PasswordBuffer[9];
 //Array for admin password
- char AdminPassword[10];
+ char AdminPassword[9];
 //Bool for keeping the device in Admin Mode and stop scanning for Cards
 bool AdminMode;
 // byte to choose between different mods of operations in Admin mode
@@ -43,8 +45,13 @@ byte Mode[2];
  const PROGMEM int user3Memory=368;
  const PROGMEM int user4Memory=552;
  const PROGMEM int user5Memory=736;
-
- //function definitions:
+//users ids saved
+byte user1Id[4];
+byte user2Id[4];
+byte user3Id[4];
+byte user4Id[4];
+byte user5Id[4];
+ //function definitions:10
 /**
  * Helper routine to dump a byte array as hex values to Serial. 
  */
@@ -70,6 +77,12 @@ void setup() {
   }
   //getting AdminPassword From EEPROM
   EEPROM.get(921,AdminPassword);
+  //getting user ids
+  EEPROM.get(user1Memory,user1Id);
+  EEPROM.get(user2Memory,user2Id);
+  EEPROM.get(user3Memory,user3Id);
+  EEPROM.get(user4Memory,user4Id);
+  EEPROM.get(user5Memory,user5Id);
 }
 
 
@@ -80,7 +93,7 @@ void loop()
   if(Serial.available() > 0)
   {
    SerialData=Serial.readStringUntil('\n');
-   SerialData.getBytes(SerialBuffer,10);
+   SerialData.getBytes(SerialBuffer,9);
    if (strcmp(AdminPassword,SerialBuffer)==0)
     {
     //starting Admin Mode
@@ -109,7 +122,7 @@ void loop()
                     {
                       SerialData="";
                       SerialData=Serial.readStringUntil('\n');
-                      SerialData.getBytes(SerialBuffer,10);
+                      SerialData.getBytes(SerialBuffer,9);
                       EEPROM.put(921,SerialBuffer); // update user password
                       EEPROM.get(921,AdminPassword);
                       Serial.println('1');
@@ -132,12 +145,23 @@ void loop()
                }
                EEPROM.put(user1Memory,nuidPICC);
                Serial.println('1');
+               while (Serial.available() <= 0 )
+               {  
+               }
                if(Serial.available() > 0)
-         {
-          SerialData="";
-          //could be implemented better !!! but just for the notte dei ricercatori
-          SerialData=Serial.readStringUntil('\n');
-          SerialData.getBytes(Mode,2);}
+                    {
+                      SerialData="";
+                      SerialData=Serial.readStringUntil('\n');
+                      SerialData.getBytes(SerialBuffer,9);
+                      EEPROM.put(user1Memory+4,SerialBuffer); // update user password
+                      EEPROM.get(user1Memory+4,PasswordBuffer);
+                      Serial.println('1');
+                      Serial.print("Password Salvata : ");
+                      Serial.println(PasswordBuffer);
+                      Mode[0] = 0;
+                      AdminMode=false;
+                      break;      
+                    }
                Mode[0] = 0;
                AdminMode=false;
                break;      
@@ -155,7 +179,7 @@ void loop()
   } 
   if(checkForCards())
   {
-  printHex(rfid.uid.uidByte,MFRC522::MF_KEY_SIZE);
+  printHex(rfid.uid.uidByte,4);
   Serial.println("");
   }
 }
