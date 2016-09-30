@@ -62,7 +62,12 @@ void printHex(byte *buffer, byte bufferSize);
  */
 bool checkForCards();
 
+/**
+ * to search internal EEPROM for a card id and extract the password saving it to PasswordBuffer
+ */
+bool getSavedPassword();
 
+//start setup
 void setup() { 
   Serial.begin(19200);
   SPI.begin(); // Init SPI bus
@@ -154,10 +159,7 @@ void loop()
                       SerialData=Serial.readStringUntil('\n');
                       SerialData.getBytes(SerialBuffer,9);
                       EEPROM.put(user1Memory+4,SerialBuffer); // update user password
-                      EEPROM.get(user1Memory+4,PasswordBuffer);
                       Serial.println('1');
-                      Serial.print("Password Salvata : ");
-                      Serial.println(PasswordBuffer);
                       Mode[0] = 0;
                       AdminMode=false;
                       break;      
@@ -179,13 +181,70 @@ void loop()
   } 
   if(checkForCards())
   {
-  printHex(rfid.uid.uidByte,4);
-  Serial.println("");
+  getSavedPassword();
   }
+ }
+
+
+bool getSavedPassword()
+{
+  //check for first user
+ if (user1Id[0] == nuidPICC[0] && 
+     user1Id[1] == nuidPICC[1] && 
+     user1Id[2] == nuidPICC[2] && 
+     user1Id[3] == nuidPICC[3] ) 
+      {
+        EEPROM.get(user1Memory+4,PasswordBuffer);
+        Serial.println(PasswordBuffer);
+        delay(500);
+        return true;
+      }
+  //check for second user
+ if (user2Id[0] == nuidPICC[0] && 
+     user2Id[1] == nuidPICC[1] && 
+     user2Id[2] == nuidPICC[2] && 
+     user2Id[3] == nuidPICC[3] ) 
+      {
+        EEPROM.get(user2Memory+4,PasswordBuffer);
+        Serial.println(PasswordBuffer);
+        delay(500);
+        return true;
+      }
+  //check for third user
+ if (user3Id[0] == nuidPICC[0] && 
+     user3Id[1] == nuidPICC[1] && 
+     user3Id[2] == nuidPICC[2] && 
+     user3Id[3] == nuidPICC[3] ) 
+      {
+        EEPROM.get(user3Memory+4,PasswordBuffer);
+        Serial.println(PasswordBuffer);
+        delay(500);
+        return true;
+      }
+    //check for forth user
+ if (user4Id[0] == nuidPICC[0] && 
+     user4Id[1] == nuidPICC[1] && 
+     user4Id[2] == nuidPICC[2] && 
+     user4Id[3] == nuidPICC[3] ) 
+      {
+        EEPROM.get(user4Memory+4,PasswordBuffer);
+        Serial.println(PasswordBuffer);
+        delay(500);
+        return true;
+      }
+  //check for last user
+ if (user5Id[0] == nuidPICC[0] && 
+     user5Id[1] == nuidPICC[1] && 
+     user5Id[2] == nuidPICC[2] && 
+     user5Id[3] == nuidPICC[3] ) 
+      {
+        EEPROM.get(user1Memory+5,PasswordBuffer);
+        Serial.println(PasswordBuffer);
+        delay(500);
+        return true;
+      }
+ return false;
 }
-
-
-
 
 
 bool checkForCards()
