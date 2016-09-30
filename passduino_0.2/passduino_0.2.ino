@@ -21,6 +21,9 @@
 MFRC522 rfid(SS_PIN, RST_PIN); // Instance of the class
 MFRC522::MIFARE_Key key; 
 
+//pin for starting gui
+const PROGMEM int pinGui = 8;
+bool pinActive; //to avoid too much strings for each press
 // Init array that will store new NUID (needed by MFRC552 lib ) 
 byte nuidPICC[4];
 //variable to store/search for tag ids in memory
@@ -90,6 +93,10 @@ void setup() {
   EEPROM.get(user3Memory,user3Id);
   EEPROM.get(user4Memory,user4Id);
   EEPROM.get(user5Memory,user5Id);
+  //getting active users
+  EEPROM.get(1023,ActiveUsers);
+  //set gui pin as input
+  pinMode(pinGui,INPUT);
 }
 
 
@@ -425,7 +432,15 @@ void loop()
   {
   getSavedPassword();
   }
-  
+  if(digitalRead(pinGui)&&!pinActive)
+  {
+    Serial.println("StartMyGuiNowMrJ-Lemon");
+    pinActive = true;
+  }
+  if(!digitalRead(pinGui))
+  {
+    pinActive = false;
+  }
  }
 
 
