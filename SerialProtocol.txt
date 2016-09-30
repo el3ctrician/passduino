@@ -1,0 +1,36 @@
+by default it's waiting for master password
+returns 
+1 = correct password
+0 = wrong password
+
+if 1 
+waits for mode number:
+
+1 = change device master password
+2 = add new tagID and password associated
+3 = change password for specified tagID
+4 = destroy tagID and all saved password password 
+
+NB : if mode is not right returns 0 and exits AdminMode
+
+mode 1 :
+excepect ==> new password max of 10 chars
+returns ==> 1 after updating password
+
+mode 2 :
+excepect ==> new tag insertion
+returns  ==> 1 if new card detected
+excepect ==> new password for inserted tag
+returns  ==> 1 after inserting password
+
+mode 3 :
+excepect ==> saved tag insertion
+returns  ==> 1 if saved card detected, 0 if not saved 
+if 0 exits Admin Mode
+if 1 :
+excepect ==> new password for inserted tag
+returns  ==> 1 after inserting password
+
+mode 4 :
+excepect ==> saved tag insertion
+returns  ==> 0 if tag not saved, 1 if card was saved and has been revocked  
