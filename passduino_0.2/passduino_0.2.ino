@@ -113,7 +113,7 @@ void loop()
           SerialData=Serial.readStringUntil('\n');
           SerialData.getBytes(Mode,2);
           //check for correct modes 
-          if(Mode[0] != 49 && Mode[0] != 50 && Mode[0] != 51 )
+          if(Mode[0] != 49 && Mode[0] != 50 && Mode[0] != 51 && Mode[0] != 52 )
            {
             Serial.println("Protocol Error !!!");
             AdminMode=false;
@@ -135,7 +135,7 @@ void loop()
                       AdminMode=false;
                       break;      
                     }
-             }
+             } 
            while(Mode[0] == 50)
            //add tag ID and password
            {
@@ -144,45 +144,234 @@ void loop()
             {
               nuidPICC[i] = 0x00;
             }
-               while(!checkForCards())
-               {
-                //wait for new card to be detected
-               }
-               EEPROM.put(user1Memory,nuidPICC);
+            while(!checkForCards())
+            {
+             //wait for new card to be detected
+            }
+            EEPROM.put(user1Memory,nuidPICC);
+            Serial.println('1');
+            while (Serial.available() <= 0 )
+            {  
+            }
+            if(Serial.available() > 0)
+            {
+             SerialData="";
+             SerialData=Serial.readStringUntil('\n');
+             SerialData.getBytes(SerialBuffer,9);
+             EEPROM.put(user1Memory+4,SerialBuffer); // update user password
+             EEPROM.get(user1Memory,user1Id);  //update new userid
+             Serial.println('1');
+             Mode[0] = 0;
+             AdminMode=false;      
+            }
+           
+            } //end of mode 50
+            while(Mode[0] == 51)
+           //change password for a specific tag
+           {
+            //init the id variable and remove any previous cards value
+            for (byte i = 0; i < 4; i++) 
+            {
+              nuidPICC[i] = 0x00;
+            }
+            while(!checkForCards())
+            {
+             //wait for new card to be detected
+            }
+            if (user1Id[0] == nuidPICC[0] && 
+                user1Id[1] == nuidPICC[1] && 
+                user1Id[2] == nuidPICC[2] && 
+                user1Id[3] == nuidPICC[3] ) 
+              {
                Serial.println('1');
                while (Serial.available() <= 0 )
-               {  
+               {
+                //wait for Serial commands  
                }
                if(Serial.available() > 0)
-                    {
-                      SerialData="";
-                      SerialData=Serial.readStringUntil('\n');
-                      SerialData.getBytes(SerialBuffer,9);
-                      EEPROM.put(user1Memory+4,SerialBuffer); // update user password
-                      Serial.println('1');
-                      Mode[0] = 0;
-                      AdminMode=false;
-                      break;      
-                    }
-               Mode[0] = 0;
-               AdminMode=false;
-               break;      
-              
+               {
+                SerialData="";
+                SerialData=Serial.readStringUntil('\n');
+                SerialData.getBytes(SerialBuffer,9);
+                EEPROM.put(user1Memory+4,SerialBuffer); // update user password
+                Serial.println('1');
+                Mode[0] = 0;
+                AdminMode=false;
+                break;  
+               }
+              }
+            if (user2Id[0] == nuidPICC[0] && 
+                user2Id[1] == nuidPICC[1] && 
+                user2Id[2] == nuidPICC[2] && 
+                user2Id[3] == nuidPICC[3] ) 
+              {
+               Serial.println('1');
+               while (Serial.available() <= 0 )
+               {
+                //wait for Serial commands  
+               }
+               if(Serial.available() > 0)
+               {
+                SerialData="";
+                SerialData=Serial.readStringUntil('\n');
+                SerialData.getBytes(SerialBuffer,9);
+                EEPROM.put(user2Memory+4,SerialBuffer); // update user password
+                Serial.println('1');
+                Mode[0] = 0;
+                AdminMode=false;
+                break;  
+               }
+              }
+            if (user3Id[0] == nuidPICC[0] && 
+                user3Id[1] == nuidPICC[1] && 
+                user3Id[2] == nuidPICC[2] && 
+                user3Id[3] == nuidPICC[3] ) 
+              {
+               Serial.println('1');
+               while (Serial.available() <= 0 )
+               {
+                //wait for Serial commands  
+               }
+               if(Serial.available() > 0)
+               {
+                SerialData="";
+                SerialData=Serial.readStringUntil('\n');
+                SerialData.getBytes(SerialBuffer,9);
+                EEPROM.put(user3Memory+4,SerialBuffer); // update user password
+                Serial.println('1');
+                Mode[0] = 0;
+                AdminMode=false;
+                break;  
+               }
+              }
+            if (user4Id[0] == nuidPICC[0] && 
+                user4Id[1] == nuidPICC[1] && 
+                user4Id[2] == nuidPICC[2] && 
+                user4Id[3] == nuidPICC[3] ) 
+              {
+               Serial.println('1');
+               while (Serial.available() <= 0 )
+               {
+                //wait for Serial commands  
+               }
+               if(Serial.available() > 0)
+               {
+                SerialData="";
+                SerialData=Serial.readStringUntil('\n');
+                SerialData.getBytes(SerialBuffer,9);
+                EEPROM.put(user4Memory+4,SerialBuffer); // update user password
+                Serial.println('1');
+                Mode[0] = 0;
+                AdminMode=false; 
+                break; 
+               }
+              }
+            if (user5Id[0] == nuidPICC[0] && 
+                user5Id[1] == nuidPICC[1] && 
+                user5Id[2] == nuidPICC[2] && 
+                user5Id[3] == nuidPICC[3] ) 
+              {
+               Serial.println('1');
+               while (Serial.available() <= 0 )
+               {
+                //wait for Serial commands  
+               }
+               if(Serial.available() > 0)
+               {
+                SerialData="";
+                SerialData=Serial.readStringUntil('\n');
+                SerialData.getBytes(SerialBuffer,9);
+                EEPROM.put(user5Memory+4,SerialBuffer); // update user password
+                Serial.println('1');
+                Mode[0] = 0;
+                AdminMode=false;
+                break;  
+               }
+              }
+            Serial.println('0');
+            Mode[0] = 0;
+            AdminMode=false; 
+            } //end of mode 51
+           
+           while(Mode[0] == 52)
+           //change password for a specific tag
+           {
+            //init the id variable and remove any previous cards value
+            for (byte i = 0; i < 4; i++) 
+            {
+              nuidPICC[i] = 0x00;
             }
-          
-          }
-         }
+            while(!checkForCards())
+            {
+             //wait for new card to be detected
+            }
+            if (user1Id[0] == nuidPICC[0] && 
+                user1Id[1] == nuidPICC[1] && 
+                user1Id[2] == nuidPICC[2] && 
+                user1Id[3] == nuidPICC[3] ) 
+              {
+              for (byte i = 0; i < 4; i++) 
+               {
+                nuidPICC[i] = 0x00; //prepare a vector of 0x00 to fill the saved ID
+               }
+               EEPROM.put(user1Memory,nuidPICC); //store 0x00 in the tag id to deleted the previous ID
+              for (byte i = 0; i < 9; i++) 
+               {
+                SerialBuffer[i] = 0x00; //prepare a vector of 0x00 to fill the saved password
+               } 
+               EEPROM.put(user1Memory+4,SerialBuffer); // delete saved passwords
+               Serial.println('1');
+               Mode[0] = 0;
+               AdminMode=false; 
+               break;
+              }
+            if (user2Id[0] == nuidPICC[0] && 
+                user2Id[1] == nuidPICC[1] && 
+                user2Id[2] == nuidPICC[2] && 
+                user2Id[3] == nuidPICC[3] ) 
+              {
+         
+              }
+            if (user3Id[0] == nuidPICC[0] && 
+                user3Id[1] == nuidPICC[1] && 
+                user3Id[2] == nuidPICC[2] && 
+                user3Id[3] == nuidPICC[3] ) 
+              {
+       
+              }
+            if (user4Id[0] == nuidPICC[0] && 
+                user4Id[1] == nuidPICC[1] && 
+                user4Id[2] == nuidPICC[2] && 
+                user4Id[3] == nuidPICC[3] ) 
+              {
+
+              }
+            if (user5Id[0] == nuidPICC[0] && 
+                user5Id[1] == nuidPICC[1] && 
+                user5Id[2] == nuidPICC[2] && 
+                user5Id[3] == nuidPICC[3] ) 
+              {
+
+              }
+            Serial.println('0');
+            Mode[0] = 0;
+            AdminMode=false; 
+            } //end of mode 52            
+          }//end of admin serial check
+         } //end of admin mode
       }
    else
     {
      Serial.print('0');
      AdminMode=false;
     }
-  } 
+  }
+   
   if(checkForCards())
   {
   getSavedPassword();
   }
+  
  }
 
 
@@ -272,8 +461,10 @@ bool checkForCards()
 
 
 
-void printHex(byte *buffer, byte bufferSize) {
-  for (i= 0; i < bufferSize; i++) {
+void printHex(byte *buffer, byte bufferSize) 
+{
+  for (i= 0; i < bufferSize; i++) 
+  {
     Serial.print(buffer[i] < 0x10 ? " 0" : " ");
     Serial.print(buffer[i], HEX);
   }
