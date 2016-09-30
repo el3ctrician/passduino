@@ -51,7 +51,9 @@ byte user2Id[4];
 byte user3Id[4];
 byte user4Id[4];
 byte user5Id[4];
- //function definitions:10
+//a byte to count users saved on device phisically on addr 1023 
+byte ActiveUsers;
+//function definitions
 /**
  * Helper routine to dump a byte array as hex values to Serial. 
  */
@@ -294,7 +296,7 @@ void loop()
             } //end of mode 51
            
            while(Mode[0] == 52)
-           //change password for a specific tag
+           //revocke card and delete passwords
            {
             //init the id variable and remove any previous cards value
             for (byte i = 0; i < 4; i++) 
@@ -330,28 +332,80 @@ void loop()
                 user2Id[2] == nuidPICC[2] && 
                 user2Id[3] == nuidPICC[3] ) 
               {
-         
+              for (byte i = 0; i < 4; i++) 
+               {
+                nuidPICC[i] = 0x00; //prepare a vector of 0x00 to fill the saved ID
+               }
+               EEPROM.put(user2Memory,nuidPICC); //store 0x00 in the tag id to deleted the previous ID
+              for (byte i = 0; i < 9; i++) 
+               {
+                SerialBuffer[i] = 0x00; //prepare a vector of 0x00 to fill the saved password
+               } 
+               EEPROM.put(user2Memory+4,SerialBuffer); // delete saved passwords
+               Serial.println('1');
+               Mode[0] = 0;
+               AdminMode=false; 
+               break;         
               }
             if (user3Id[0] == nuidPICC[0] && 
                 user3Id[1] == nuidPICC[1] && 
                 user3Id[2] == nuidPICC[2] && 
                 user3Id[3] == nuidPICC[3] ) 
               {
-       
+              for (byte i = 0; i < 4; i++) 
+               {
+                nuidPICC[i] = 0x00; //prepare a vector of 0x00 to fill the saved ID
+               }
+               EEPROM.put(user3Memory,nuidPICC); //store 0x00 in the tag id to deleted the previous ID
+              for (byte i = 0; i < 9; i++) 
+               {
+                SerialBuffer[i] = 0x00; //prepare a vector of 0x00 to fill the saved password
+               } 
+               EEPROM.put(user3Memory+4,SerialBuffer); // delete saved passwords
+               Serial.println('1');
+               Mode[0] = 0;
+               AdminMode=false; 
+               break;       
               }
             if (user4Id[0] == nuidPICC[0] && 
                 user4Id[1] == nuidPICC[1] && 
                 user4Id[2] == nuidPICC[2] && 
                 user4Id[3] == nuidPICC[3] ) 
               {
-
+              for (byte i = 0; i < 4; i++) 
+               {
+                nuidPICC[i] = 0x00; //prepare a vector of 0x00 to fill the saved ID
+               }
+               EEPROM.put(user4Memory,nuidPICC); //store 0x00 in the tag id to deleted the previous ID
+              for (byte i = 0; i < 9; i++) 
+               {
+                SerialBuffer[i] = 0x00; //prepare a vector of 0x00 to fill the saved password
+               } 
+               EEPROM.put(user4Memory+4,SerialBuffer); // delete saved passwords
+               Serial.println('1');
+               Mode[0] = 0;
+               AdminMode=false; 
+               break;
               }
             if (user5Id[0] == nuidPICC[0] && 
                 user5Id[1] == nuidPICC[1] && 
                 user5Id[2] == nuidPICC[2] && 
                 user5Id[3] == nuidPICC[3] ) 
               {
-
+              for (byte i = 0; i < 4; i++) 
+               {
+                nuidPICC[i] = 0x00; //prepare a vector of 0x00 to fill the saved ID
+               }
+               EEPROM.put(user5Memory,nuidPICC); //store 0x00 in the tag id to deleted the previous ID
+              for (byte i = 0; i < 9; i++) 
+               {
+                SerialBuffer[i] = 0x00; //prepare a vector of 0x00 to fill the saved password
+               } 
+               EEPROM.put(user5Memory+4,SerialBuffer); // delete saved passwords
+               Serial.println('1');
+               Mode[0] = 0;
+               AdminMode=false; 
+               break;
               }
             Serial.println('0');
             Mode[0] = 0;
