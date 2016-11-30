@@ -4,7 +4,7 @@ PassDuino is a hardware password manager with open hardware design based on Ardu
 #Authors
 *J-Lemon
 *El3ctrician
-
+*Arsanios
 Both from HLCS (HackLab Cosenza)
 
 #Description
